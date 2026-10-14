@@ -50,22 +50,43 @@ This project, developed for Track 1 (Problem Statement PS-C1) of the Qiskit Fall
 
 The non-relativistic electronic Hamiltonian of a molecular system in the Born-Oppenheimer approximation is given in second-quantized form by:
 
-$$H = \sum_{p, q} h_{pq} a_p^\dagger a_q + \frac{1}{2} \sum_{p, q, r, s} h_{pqrs} a_p^\dagger a_q^\dagger a_s a_r$$
+$$
+H = \sum_{p, q} h_{pq} a_p^\dagger a_q + \frac{1}{2} \sum_{p, q, r, s} h_{pqrs} a_p^\dagger a_q^\dagger a_s a_r
+$$
 
-where $h_{pq}$ represents the one-electron kinetic and electron-nuclear attraction integrals, and $h_{pqrs}$ represents the two-electron Coulomb and exchange repulsion integrals.
+where:
+* $h_{pq}$ represents the one-electron kinetic energy and electron-nuclear Coulomb attraction integrals:
+  $$h_{pq} = \int \phi_p^*(\mathbf{r}) \left( -\frac{1}{2}\nabla^2 - \sum_A \frac{Z_A}{|\mathbf{r} - \mathbf{R}_A|} \right) \phi_q(\mathbf{r}) \, d\mathbf{r}$$
+* $h_{pqrs}$ represents the two-electron Coulomb and exchange repulsion integrals:
+  $$h_{pqrs} = \iint \frac{\phi_p^*(\mathbf{r}_1) \phi_q^*(\mathbf{r}_2) \phi_s(\mathbf{r}_2) \phi_r(\mathbf{r}_1)}{|\mathbf{r}_1 - \mathbf{r}_2|} \, d\mathbf{r}_1 d\mathbf{r}_2$$
 
-For molecular hydrogen ($H_2$) at equilibrium bond length ($R = 0.74\text{ Å}$) in the minimal STO-3G basis, the physical system consists of 2 spatial orbitals ($1\sigma_g$ bonding and $1\sigma_u^*$ antibonding), which expand into 4 spin-orbitals:
-$$\{|\phi_0\rangle = |1\sigma_g \uparrow\rangle, |\phi_1\rangle = |1\sigma_g \downarrow\rangle, |\phi_2\rangle = |1\sigma_u^* \uparrow\rangle, |\phi_3\rangle = |1\sigma_u^* \downarrow\rangle\}$$
+For molecular hydrogen ($H_2$) at equilibrium bond length ($R = 0.74\text{ Å}$) in the minimal STO-3G basis, the physical system consists of two spatial molecular orbitals:
+1. $1\sigma_g$ (bonding orbital)
+2. $1\sigma_u^*$ (antibonding orbital)
+
+These expand into 4 spin-orbitals:
+* $|\phi_0\rangle = |1\sigma_g \uparrow\rangle$ (spin-orbital 0, spin up)
+* $|\phi_1\rangle = |1\sigma_g \downarrow\rangle$ (spin-orbital 1, spin down)
+* $|\phi_2\rangle = |1\sigma_u^* \uparrow\rangle$ (spin-orbital 2, spin up)
+* $|\phi_3\rangle = |1\sigma_u^* \downarrow\rangle$ (spin-orbital 3, spin down)
 
 Applying the standard Jordan-Wigner transformation:
-$$a_j^\dagger = \left( \bigotimes_{k=0}^{j-1} Z_k \right) \otimes \sigma_j^+$$
+
+$$
+a_j^\dagger = \left( \bigotimes_{k=0}^{j-1} Z_k \right) \otimes \frac{X_j - i Y_j}{2}
+$$
 
 maps the 4 fermionic spin-orbitals to 4 quantum spins, yielding the canonical 15-term qubit Hamiltonian:
 
-$$H = c_0 I + \sum_{i=0}^3 c_i Z_i + \sum_{i < j} c_{ij} Z_i Z_j + c_{xxyy} (X_0 X_1 Y_2 Y_3 + Y_0 Y_1 X_2 X_3 - X_0 Y_1 Y_2 X_3 - Y_0 X_1 X_2 Y_3)$$
+$$
+H = c_0 I + \sum_{i=0}^3 c_i Z_i + \sum_{i < j} c_{ij} Z_i Z_j + c_{xxyy} (X_0 X_1 Y_2 Y_3 + Y_0 Y_1 X_2 X_3 - X_0 Y_1 Y_2 X_3 - Y_0 X_1 X_2 Y_3)
+$$
 
 Diagonalizing this Hamiltonian classically via Full Configuration Interaction (FCI) yields the exact reference ground-state energy:
-$$E_{\text{FCI}} = -1.137000\text{ Hartree}$$
+
+$$
+E_{\text{FCI}} = -1.137000\text{ Hartree}
+$$
 
 ---
 
