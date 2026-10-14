@@ -118,8 +118,8 @@ def main():
         console.print("  [2] True Hardware Co-Design Analysis (Zero-SWAP Verification)")
         console.print("  [3] Live Noisy VQE Closed-Loop Simulation (4096 Shots)")
         console.print("  [4] Z2 Symmetry Tapering (4Q to 2Q Active Space Reduction)")
-        console.print("  [5] Graph Spectral Invariants (Laplacian Algebraic Connectivity λ₂)")
-        console.print("  [6] Launch Interactive Streamlit Web GUI (`streamlit run app.py`)")
+        console.print("  [5] Graph Spectral Invariants (Laplacian Algebraic Connectivity lambda_2)")
+        console.print("  [6] Run Master 10-Module Verification Suite (`python test_submission.py`)")
         console.print("  [7] Run Complete Automated Benchmark Suite (`python run_benchmark.py`)")
         console.print("  [0] Exit")
 
@@ -134,18 +134,18 @@ def main():
         elif choice == "4":
             sym = benchmark_symmetry_tapering_impact()
             console.print(f"\n[green]Z2 Symmetry Tapering Results:[/green]")
-            console.print(f"  • Processor A: 4Q Depth {sym['4q_processor_a']['transpiled_depth']} -> 2Q Tapered Depth {sym['2q_tapered_processor_a']['transpiled_depth']} (-{sym['depth_reduction_proc_a']} depth)")
-            console.print(f"  • Processor B: 4Q Depth {sym['4q_processor_b']['transpiled_depth']} -> 2Q Tapered Depth {sym['2q_tapered_processor_b']['transpiled_depth']} (-{sym['depth_reduction_proc_b']} depth)")
+            console.print(f"  * Processor A: 4Q Depth {sym['4q_processor_a']['transpiled_depth']} -> 2Q Tapered Depth {sym['2q_tapered_processor_a']['transpiled_depth']} (-{sym['depth_reduction_proc_a']} depth)")
+            console.print(f"  * Processor B: 4Q Depth {sym['4q_processor_b']['transpiled_depth']} -> 2Q Tapered Depth {sym['2q_tapered_processor_b']['transpiled_depth']} (-{sym['depth_reduction_proc_b']} depth)")
         elif choice == "5":
             spec = compare_spectral_topologies()
             console.print(f"\n[cyan]Graph Spectral Analysis:[/cyan]")
-            console.print(f"  • Processor A: Diameter = {spec['processor_a']['diameter']}, λ₂ = {spec['processor_a']['algebraic_connectivity_lambda2']:.4f}")
-            console.print(f"  • Processor B: Diameter = {spec['processor_b']['diameter']}, λ₂ = {spec['processor_b']['algebraic_connectivity_lambda2']:.4f}")
+            console.print(f"  * Processor A: Diameter = {spec['processor_a']['diameter']}, lambda_2 = {spec['processor_a']['algebraic_connectivity_lambda2']:.4f}")
+            console.print(f"  * Processor B: Diameter = {spec['processor_b']['diameter']}, lambda_2 = {spec['processor_b']['algebraic_connectivity_lambda2']:.4f}")
         elif choice == "6":
-            console.print("\n[bold green]Launching Streamlit Web App... Press Ctrl+C to return.[/bold green]")
-            os.system("streamlit run app.py")
+            console.print("\n[bold green]Running Master Verification Suite...[/bold green]")
+            os.system(f"{sys.executable} test_submission.py")
         elif choice == "7":
-            os.system("python run_benchmark.py")
+            os.system(f"{sys.executable} run_benchmark.py")
         elif choice == "0":
             console.print("[dim]Exiting benchmark suite. Good luck at Qiskit Fall Hackathon 2026 (SRM AP)![/dim]")
             break

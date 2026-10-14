@@ -35,7 +35,7 @@ from src.symmetry import benchmark_symmetry_tapering_impact
 
 def run_full_validation():
     print("=" * 80)
-    print("      QISKIT FALL HACKATHON 2026 (SRM AP) — MASTER VERIFICATION SUITE         ")
+    print("      QISKIT FALL HACKATHON 2026 (SRM AP) -- MASTER VERIFICATION SUITE         ")
     print("=" * 80)
 
     # 1. Molecular Formulation
@@ -44,7 +44,7 @@ def run_full_validation():
     eigs = np.linalg.eigvalsh(H.to_matrix())
     lowest_eig = float(eigs[0])
     delta_eig = abs(lowest_eig - fci_ref)
-    print(f"  • Molecule: {meta['molecule']} | Active Qubits: {H.num_qubits} | Terms: {len(H)}")
+    print(f"  * Molecule: {meta['molecule']} | Active Qubits: {H.num_qubits} | Terms: {len(H)}")
     print(f"  * Classical FCI: {fci_ref:.6f} Ha | Lowest Eigenvalue: {lowest_eig:.6f} Ha (Delta = {delta_eig:.8f} Ha)")
     assert delta_eig < 1e-4, "Hamiltonian ground state does not match FCI!"
     print("  -> PASSED: Exact match with theoretical reference benchmark")
@@ -54,9 +54,9 @@ def run_full_validation():
     proc_a = get_processor_a(seed=42)
     proc_b = get_processor_b(seed=42)
     noise = get_official_noise_model()
-    print(f"  • Processor A: {proc_a.num_qubits} qubits, {len(PROCESSOR_A_EDGES)} edges (Branching Tree)")
-    print(f"  • Processor B: {proc_b.num_qubits} qubits, {len(PROCESSOR_B_EDGES)} edges (Heavy-Hex)")
-    print(f"  • Noise: 1Q Error=0.10%, 2Q CX Error=0.50%, Readout Error=1.00%")
+    print(f"  * Processor A: {proc_a.num_qubits} qubits, {len(PROCESSOR_A_EDGES)} edges (Branching Tree)")
+    print(f"  * Processor B: {proc_b.num_qubits} qubits, {len(PROCESSOR_B_EDGES)} edges (Heavy-Hex)")
+    print(f"  * Noise: 1Q Error=0.10%, 2Q CX Error=0.50%, Readout Error=1.00%")
     assert proc_a.num_qubits == 5 and proc_b.num_qubits == 9, "Qubit count mismatch"
     print("  -> PASSED: Hardware backends and synthetic noise profile verified")
 
@@ -64,28 +64,28 @@ def run_full_validation():
     print("\n[MODULE 3] Compilation & Routing Overhead (src/routing.py & metrics.py)")
     ansatz = build_h2_ansatz(num_qubits=4, reps=2, entanglement="full")
     mA, mB, delta = benchmark_routing_overheads(ansatz, proc_a, proc_b, optimization_level=1, seed_transpiler=42)
-    print(f"  • Processor A: Depth={mA['transpiled_depth']}, CX={mA['cx_count']}, SWAPs=~{mA['swap_equivalent']}")
-    print(f"  • Processor B: Depth={mB['transpiled_depth']}, CX={mB['cx_count']}, SWAPs=~{mB['swap_equivalent']}")
-    print(f"  • Routing Delta (B vs A): +{delta['cx_difference (B - A)']} CX gates (+{delta['cx_percent_change']:.1f}%), +{delta['depth_difference (B - A)']} depth")
+    print(f"  * Processor A: Depth={mA['transpiled_depth']}, CX={mA['cx_count']}, SWAPs=~{mA['swap_equivalent']}")
+    print(f"  * Processor B: Depth={mB['transpiled_depth']}, CX={mB['cx_count']}, SWAPs=~{mB['swap_equivalent']}")
+    print(f"  * Routing Delta (B vs A): +{delta['cx_difference (B - A)']} CX gates (+{delta['cx_percent_change']:.1f}%), +{delta['depth_difference (B - A)']} depth")
     print("  -> PASSED: Heavy-hex routing penalty quantified")
 
     # 4. Hardware-Native Co-Design (ZERO SWAPs)
     print("\n[MODULE 4] True Algorithm-Hardware Co-Design (src/co_design.py)")
     cd = benchmark_codesign_impact(optimization_level=1, seed_transpiler=42)
-    print(f"  • Processor A Native: Depth={cd['codesign_a']['transpiled_depth']}, CX={cd['codesign_a']['cx_count']}, SWAPs=0 (ZERO SWAPs!)")
-    print(f"  • Processor A Savings: -{cd['proc_a_cx_savings']} CX gates (-71.4%), -{cd['proc_a_depth_reduction']} depth (-52.1%)")
-    print(f"  • Processor B Native: Depth={cd['codesign_b']['transpiled_depth']}, CX={cd['codesign_b']['cx_count']}, SWAPs=0 (ZERO SWAPs!)")
-    print(f"  • Processor B Savings: -{cd['proc_b_cx_savings']} CX gates (-66.7%), -{cd['proc_b_depth_reduction']} depth (-51.0%)")
+    print(f"  * Processor A Native: Depth={cd['codesign_a']['transpiled_depth']}, CX={cd['codesign_a']['cx_count']}, SWAPs=0 (ZERO SWAPs!)")
+    print(f"  * Processor A Savings: -{cd['proc_a_cx_savings']} CX gates (-71.4%), -{cd['proc_a_depth_reduction']} depth (-52.1%)")
+    print(f"  * Processor B Native: Depth={cd['codesign_b']['transpiled_depth']}, CX={cd['codesign_b']['cx_count']}, SWAPs=0 (ZERO SWAPs!)")
+    print(f"  * Processor B Savings: -{cd['proc_b_cx_savings']} CX gates (-66.7%), -{cd['proc_b_depth_reduction']} depth (-51.0%)")
     assert cd['codesign_a']['cx_overhead'] == 0 and cd['codesign_b']['cx_overhead'] == 0
     print("  -> PASSED: Co-design completely eliminates 100% of physical SWAP routing")
 
     # 5. QWC Measurement Grouping
     print("\n[MODULE 5] QWC Measurement Grouping (src/grouping.py)")
     qwc = benchmark_qwc_grouping(H)
-    print(f"  • Original Pauli Terms:      {qwc['original_pauli_terms']}")
-    print(f"  • QWC Measurement Cliques:    {qwc['qwc_measurement_cliques']}")
-    print(f"  • Circuit Execution Savings: {qwc['circuit_reduction_percent']:.1f}%")
-    print(f"  • Shot Efficiency Gain:      {qwc['shot_efficiency_gain']:.2f}x")
+    print(f"  * Original Pauli Terms:      {qwc['original_pauli_terms']}")
+    print(f"  * QWC Measurement Cliques:    {qwc['qwc_measurement_cliques']}")
+    print(f"  * Circuit Execution Savings: {qwc['circuit_reduction_percent']:.1f}%")
+    print(f"  * Shot Efficiency Gain:      {qwc['shot_efficiency_gain']:.2f}x")
     assert qwc['qwc_measurement_cliques'] < qwc['original_pauli_terms']
     print("  -> PASSED: 66.7% measurement circuit reduction confirmed")
 
@@ -93,16 +93,16 @@ def run_full_validation():
     print("\n[MODULE 6] Multi-Molecule Chemical Transferability (src/molecules.py)")
     mol_res = benchmark_cross_molecule_co_design()
     for m_name, d in mol_res.items():
-        print(f"  • {m_name:<5}: FCI Target={d['fci_target']:.4f} Ha | Proc A CX={d['processor_a']['cx_count']} | Proc B CX={d['processor_b']['cx_count']}")
+        print(f"  * {m_name:<5}: FCI Target={d['fci_target']:.4f} Ha | Proc A CX={d['processor_a']['cx_count']} | Proc B CX={d['processor_b']['cx_count']}")
     assert len(mol_res) == 3
     print("  -> PASSED: Universal molecular catalog (H2, HeH+, LiH) validated")
 
     # 7. Dynamical Decoupling (DD)
     print("\n[MODULE 7] Dynamical Decoupling Idle Protection (src/dynamical_decoupling.py)")
     dd_stats = benchmark_dd_overhead(ansatz)
-    print(f"  • Original Circuit Depth: {dd_stats['original_depth']}")
-    print(f"  • CPMG Refocusing Pulses: +{dd_stats['cpmg_refocusing_pulses']} pulses (X-X sequence)")
-    print(f"  • XY4 Refocusing Pulses:  +{dd_stats['xy4_refocusing_pulses']} pulses (X-Y-X-Y sequence)")
+    print(f"  * Original Circuit Depth: {dd_stats['original_depth']}")
+    print(f"  * CPMG Refocusing Pulses: +{dd_stats['cpmg_refocusing_pulses']} pulses (X-X sequence)")
+    print(f"  * XY4 Refocusing Pulses:  +{dd_stats['xy4_refocusing_pulses']} pulses (X-Y-X-Y sequence)")
     assert dd_stats['cpmg_refocusing_pulses'] > 0
     print("  -> PASSED: Dynamical decoupling refocusing pulses successfully scheduled")
 
@@ -121,7 +121,7 @@ def run_full_validation():
     print("\n[MODULE 9] Native Superconducting Gate Decompositions (src/pulse_basis.py)")
     pulse_res = benchmark_all_native_bases(ansatz)
     for b_name, d in pulse_res["processor_a"].items():
-        print(f"  • {b_name:<12}: Depth={d['transpiled_depth']}, 2Q Entangling Gates={d['entangling_gate_count']}, Total={d['total_gates']}")
+        print(f"  * {b_name:<12}: Depth={d['transpiled_depth']}, 2Q Entangling Gates={d['entangling_gate_count']}, Total={d['total_gates']}")
     assert "ECR_Falcon" in pulse_res["processor_a"] and "CZ_Eagle" in pulse_res["processor_a"]
     print("  -> PASSED: Physical microwave basis compilation confirmed")
 
