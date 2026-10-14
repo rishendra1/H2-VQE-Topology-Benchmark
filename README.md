@@ -51,36 +51,26 @@ This project, developed for Track 1 (Problem Statement PS-C1) of the Qiskit Fall
 The non-relativistic electronic Hamiltonian of a molecular system in the Born-Oppenheimer approximation is given in second-quantized form by:
 
 $$
-H = \sum_{p, q} h_{pq} a_p^\dagger a_q + \frac{1}{2} \sum_{p, q, r, s} h_{pqrs} a_p^\dagger a_q^\dagger a_s a_r
+H = \sum_{pq} h_{pq} a_p^\dagger a_q + \frac{1}{2} \sum_{pqrs} h_{pqrs} a_p^\dagger a_q^\dagger a_s a_r
 $$
 
 where:
-* **One-electron integrals** ($h_{pq}$): Kinetic energy and electron-nuclear Coulomb attraction:
+* $h_{pq}$ represents the one-electron integrals (electron kinetic energy and electron-nuclear Coulomb attraction).
+* $h_{pqrs}$ represents the two-electron Coulomb repulsion and exchange integrals.
 
-$$
-h_{pq} = \int \phi_p^\ast(\mathbf{r}) \left( -\frac{1}{2}\nabla^2 - \sum_A \frac{Z_A}{|\mathbf{r} - \mathbf{R}_A|} \right) \phi_q(\mathbf{r}) \, d\mathbf{r}
-$$
+For molecular hydrogen (H2) at equilibrium bond length ($R = 0.74\text{ Å}$) in the minimal STO-3G basis, the physical system consists of two spatial molecular orbitals ($1\sigma_g$ bonding and $1\sigma_u$ antibonding), which expand into 4 spin-orbitals mapped to 4 qubits:
 
-* **Two-electron integrals** ($h_{pqrs}$): Electron-electron Coulomb repulsion and exchange:
-
-$$
-h_{pqrs} = \iint \frac{\phi_p^\ast(\mathbf{r}_1) \phi_q^\ast(\mathbf{r}_2) \phi_s(\mathbf{r}_2) \phi_r(\mathbf{r}_1)}{|\mathbf{r}_1 - \mathbf{r}_2|} \, d\mathbf{r}_1 d\mathbf{r}_2
-$$
-
-For molecular hydrogen (H2) at equilibrium bond length (R = 0.74 Å) in the minimal STO-3G basis, the physical system consists of two spatial molecular orbitals:
-1. $1\sigma_g$ (bonding molecular orbital)
-2. $1\sigma_u^\ast$ (antibonding molecular orbital)
-
-These expand into 4 spin-orbitals:
-* $|\phi_0\rangle = |1\sigma_g \uparrow\rangle$ (bonding orbital, spin up)
-* $|\phi_1\rangle = |1\sigma_g \downarrow\rangle$ (bonding orbital, spin down)
-* $|\phi_2\rangle = |1\sigma_u^\ast \uparrow\rangle$ (antibonding orbital, spin up)
-* $|\phi_3\rangle = |1\sigma_u^\ast \downarrow\rangle$ (antibonding orbital, spin down)
+| Qubit | Spin-Orbital | Molecular Orbital Type | Spin Orientation | State Notation |
+| :---: | :---: | :--- | :---: | :---: |
+| `q0` | $\phi_0$ | $1\sigma_g$ (Bonding) | Spin Up ($\alpha$) | $|1\sigma_g \uparrow\rangle$ |
+| `q1` | $\phi_1$ | $1\sigma_g$ (Bonding) | Spin Down ($\beta$) | $|1\sigma_g \downarrow\rangle$ |
+| `q2` | $\phi_2$ | $1\sigma_u$ (Antibonding) | Spin Up ($\alpha$) | $|1\sigma_u \uparrow\rangle$ |
+| `q3` | $\phi_3$ | $1\sigma_u$ (Antibonding) | Spin Down ($\beta$) | $|1\sigma_u \downarrow\rangle$ |
 
 Applying the standard Jordan-Wigner transformation:
 
 $$
-a_j^\dagger = \left( \bigotimes_{k=0}^{j-1} Z_k \right) \otimes \frac{X_j - i Y_j}{2}
+a_j^\dagger = \left( \prod_{k < j} Z_k \right) \otimes \frac{X_j - i Y_j}{2}
 $$
 
 maps the 4 fermionic spin-orbitals to 4 quantum spins, yielding the canonical 15-term qubit Hamiltonian:
