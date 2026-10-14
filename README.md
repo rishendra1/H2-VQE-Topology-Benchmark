@@ -55,38 +55,45 @@ H = \sum_{p, q} h_{pq} a_p^\dagger a_q + \frac{1}{2} \sum_{p, q, r, s} h_{pqrs} 
 $$
 
 where:
-* h_pq represents the one-electron kinetic energy and electron-nuclear Coulomb attraction integrals:
-  $$h_{pq} = \int \phi_p^*(\mathbf{r}) \left( -\frac{1}{2}\nabla^2 - \sum_A \frac{Z_A}{|\mathbf{r} - \mathbf{R}_A|} \right) \phi_q(\mathbf{r}) \, d\mathbf{r}$$
-* h_pqrs represents the two-electron Coulomb and exchange repulsion integrals:
-  $$h_{pqrs} = \iint \frac{\phi_p^*(\mathbf{r}_1) \phi_q^*(\mathbf{r}_2) \phi_s(\mathbf{r}_2) \phi_r(\mathbf{r}_1)}{|\mathbf{r}_1 - \mathbf{r}_2|} \, d\mathbf{r}_1 d\mathbf{r}_2$$
+* **One-electron integrals** ($h_{pq}$): Kinetic energy and electron-nuclear Coulomb attraction:
+
+$$
+h_{pq} = \int \phi_p^\ast(\mathbf{r}) \left( -\frac{1}{2}\nabla^2 - \sum_A \frac{Z_A}{|\mathbf{r} - \mathbf{R}_A|} \right) \phi_q(\mathbf{r}) \, d\mathbf{r}
+$$
+
+* **Two-electron integrals** ($h_{pqrs}$): Electron-electron Coulomb repulsion and exchange:
+
+$$
+h_{pqrs} = \iint \frac{\phi_p^\ast(\mathbf{r}_1) \phi_q^\ast(\mathbf{r}_2) \phi_s(\mathbf{r}_2) \phi_r(\mathbf{r}_1)}{|\mathbf{r}_1 - \mathbf{r}_2|} \, d\mathbf{r}_1 d\mathbf{r}_2
+$$
 
 For molecular hydrogen (H2) at equilibrium bond length (R = 0.74 Å) in the minimal STO-3G basis, the physical system consists of two spatial molecular orbitals:
-1. 1sigma_g (bonding orbital)
-2. 1sigma_u* (antibonding orbital)
+1. $1\sigma_g$ (bonding molecular orbital)
+2. $1\sigma_u^\ast$ (antibonding molecular orbital)
 
 These expand into 4 spin-orbitals:
-* |\phi_0\rangle = |1sigma_g \uparrow\rangle (spin-orbital 0, spin up)
-* |\phi_1\rangle = |1sigma_g \downarrow\rangle (spin-orbital 1, spin down)
-* |\phi_2\rangle = |1sigma_u* \uparrow\rangle (spin-orbital 2, spin up)
-* |\phi_3\rangle = |1sigma_u* \downarrow\rangle (spin-orbital 3, spin down)
+* $|\phi_0\rangle = |1\sigma_g \uparrow\rangle$ (bonding orbital, spin up)
+* $|\phi_1\rangle = |1\sigma_g \downarrow\rangle$ (bonding orbital, spin down)
+* $|\phi_2\rangle = |1\sigma_u^\ast \uparrow\rangle$ (antibonding orbital, spin up)
+* $|\phi_3\rangle = |1\sigma_u^\ast \downarrow\rangle$ (antibonding orbital, spin down)
 
 Applying the standard Jordan-Wigner transformation:
 
-H2H2
+$$
 a_j^\dagger = \left( \bigotimes_{k=0}^{j-1} Z_k \right) \otimes \frac{X_j - i Y_j}{2}
-H2H2
+$$
 
 maps the 4 fermionic spin-orbitals to 4 quantum spins, yielding the canonical 15-term qubit Hamiltonian:
 
-H2H2
+$$
 H = c_0 I + \sum_{i=0}^3 c_i Z_i + \sum_{i < j} c_{ij} Z_i Z_j + c_{xxyy} (X_0 X_1 Y_2 Y_3 + Y_0 Y_1 X_2 X_3 - X_0 Y_1 Y_2 X_3 - Y_0 X_1 X_2 Y_3)
-H2H2
+$$
 
 Diagonalizing this Hamiltonian classically via Full Configuration Interaction (FCI) yields the exact reference ground-state energy:
 
-H2H2
+$$
 E_{\text{FCI}} = -1.137000\text{ Hartree}
-H2H2
+$$
 
 ---
 
@@ -115,7 +122,7 @@ We compiled a standard 4-qubit all-to-all parameterized ansatz using Qiskit's he
 Why does Processor B—despite possessing more total qubits and coupling edges—suffer worse compilation overhead than Processor A?
 * **Sub-Cubic Degree Sparsity:** In heavy-hex layouts, qubits have a maximum coordination number of 3, and data qubits are separated by degree-2 bridge qubits.
 * **Graph Diameter Dilation:** The shortest topological distance between arbitrary pairs of data qubits is longer in heavy-hex graphs than in centralized star/tree graphs.
-* **Routing Consequence:** The compiler cannot find direct physical edges for all-to-all entangling pairs, forcing the insertion of additional SWAP chains (1\text{ SWAP} \equiv 3\text{ CX}), as verified by graph Laplacian spectral analysis (lambda_2 = 0.438 for heavy-hex).
+* **Routing Consequence:** The compiler cannot find direct physical edges for all-to-all entangling pairs, forcing the insertion of additional SWAP chains ($1\text{ SWAP} \equiv 3\text{ CX}$), as verified by graph Laplacian spectral analysis ($\lambda_2 = 0.438$ for heavy-hex).
 
 ---
 
@@ -123,10 +130,15 @@ Why does Processor B—despite possessing more total qubits and coupling edges�
 
 Rather than treating the hardware compiler as a black box and accepting SWAP routing penalties, our team formulated an **Algorithm-Hardware Co-Design Principle**:
 
-$$\text{Graph}(U_{\text{ansatz}}) \subseteq \text{Graph}(G_{\text{hardware}})$$
+$$
+\text{Graph}(U_{\text{ansatz}}) \subseteq \text{Graph}(G_{\text{hardware}})
+$$
 
 If the entangling two-qubit unitary operations in the parameterized ansatz are synthesized exclusively along existing edges of the physical hardware coupling map, the routing pass becomes trivial, and the required number of physical SWAP gates is mathematically zero:
-$$\text{SWAP}_{\text{required}} = 0$$
+
+$$
+\text{SWAP}_{\text{required}} = 0
+$$
 
 We synthesized tailored hardware-adapted native ansätze for each device:
 * **Processor A Native:** Entangling layers strictly mirror the tree edges: `(0,1), (1,2), (1,3)`.
@@ -178,23 +190,34 @@ To eliminate the upward noise bias and recover chemical accuracy on noisy hardwa
 
 ### Unitary Gate Folding Mechanism
 For each two-qubit CX gate in the circuit, we insert identity pairs:
-$$\text{CX} \longrightarrow \text{CX} (\text{CX}^\dagger \text{CX})^k, \quad k \in \{0, 1, 2\}$$
 
-Because \text{CX}^\dagger \text{CX} = I, the logical unitary of the circuit is mathematically invariant:
-$$U_{\text{folded}} = U_{\text{original}}$$
+$$
+\text{CX} \longrightarrow \text{CX} (\text{CX}^\dagger \text{CX})^k, \quad k \in \{0, 1, 2\}
+$$
+
+Because $\text{CX}^\dagger \text{CX} = I$, the logical unitary of the circuit is mathematically invariant:
+
+$$
+U_{\text{folded}} = U_{\text{original}}
+$$
 
 However, physical noise scales with the odd integer factor:
-$$\lambda = 2k + 1 \in \{1, 3, 5\}$$
+
+$$
+\lambda = 2k + 1 \in \{1, 3, 5\}
+$$
 
 ![Zero-Noise Extrapolation](results/figures/zne_extrapolation.png)
-*Figure 4: Zero-Noise Extrapolation (ZNE) via digital gate folding across noise scale factors lambda in \{1, 3, 5\}. A second-order Richardson polynomial extrapolation cleanly bridges back to lambda = 0, recovering the true ground state within the chemical accuracy band (± 1.6 mHa).*
+*Figure 4: Zero-Noise Extrapolation (ZNE) via digital gate folding across noise scale factors $\lambda \in \{1, 3, 5\}$. A second-order Richardson polynomial extrapolation cleanly bridges back to $\lambda = 0$, recovering the true ground state within the chemical accuracy band (±1.6 mHa).*
 
 ### Extrapolation Mathematics
-Using the measured energies at lambda = 1, 3, 5, we perform Richardson polynomial extrapolation to evaluate the zero-noise limit:
+Using the measured energies at $\lambda \in \{1, 3, 5\}$, we perform Richardson polynomial extrapolation to evaluate the zero-noise limit:
 
-$$E(0) = \sum_{j=1}^m \left( \prod_{k \ne j} \frac{-\lambda_k}{\lambda_j - \lambda_k} \right) E(\lambda_j)$$
+$$
+E(0) = \sum_{j=1}^m \left( \prod_{k \ne j} \frac{-\lambda_k}{\lambda_j - \lambda_k} \right) E(\lambda_j)
+$$
 
-For scale factors \{1, 3, 5\}, the exact Richardson weights are \gamma_1 = \frac{15}{8}, \gamma_2 = -\frac{10}{8}, and \gamma_3 = \frac{3}{8}. This extrapolation cancels noise terms up to second order in O(lambda^2), bringing the final energy to **-1.1356 Ha**—comfortably within the **1.6 mHa (1 kcal/mol)** chemical accuracy band.
+For scale factors $\{1, 3, 5\}$, the exact Richardson weights are $\gamma_1 = \frac{15}{8}$, $\gamma_2 = -\frac{10}{8}$, and $\gamma_3 = \frac{3}{8}$. This extrapolation cancels noise terms up to second order in $\mathcal{O}(\lambda^2)$, bringing the final energy to **-1.1356 Ha**—comfortably within the **1.6 mHa (1 kcal/mol)** chemical accuracy band.
 
 ---
 
@@ -240,17 +263,27 @@ A fundamental question in quantum chemistry is: *Why is VQE strictly necessary i
 
 To answer this, we modeled bond cleavage up to R = 3.0 Å and tracked the bipartite orbital entanglement entropy S(rho_A) between bonding and antibonding spatial orbitals:
 
-$$S(\rho_A) = -\text{Tr}(\rho_A \ln \rho_A)$$
+$$
+S(\rho_A) = -\text{Tr}(\rho_A \ln \rho_A)
+$$
 
 ![Bond Dissociation & Entanglement Entropy](results/figures/bond_dissociation_entanglement.png)
 *Figure 7: Chemical bond cleavage and orbital entanglement entropy scaling. Left axis: Ground-state energy E(R) (Hartree). Right axis: Bipartite orbital entanglement entropy S(rho_A) (nats), scaling from 0.07 at equilibrium to the maximal ln(2) = 0.6931 nats Bell-state bound at dissociation.*
 
 ### Physics of Static Correlation
-* **At Equilibrium (R = 0.74 Å):** The HOMO-LUMO gap is large (~ 0.75 Ha). The Hartree-Fock state |1010> represents 98.7% of the true wavefunction. Entanglement entropy is low (S ≈ 0.0697 nats). Single-determinant classical methods work well.
+* **At Equilibrium (R = 0.74 Å):** The HOMO-LUMO gap is large (~0.75 Ha). The Hartree-Fock state $|1010\rangle$ represents 98.7% of the true wavefunction. Entanglement entropy is low ($S \approx 0.0697\text{ nats}$). Single-determinant classical methods work well.
 * **At Dissociation (R >= 2.0 Å):** The bonding and antibonding orbitals become degenerate. Static correlation explodes, and the wavefunction becomes an equal-weight, maximally entangled Bell-like superposition:
-  $$|\psi\rangle \approx \frac{1}{\sqrt{2}} (|1010> - |0101>)$$
+
+$$
+|\psi\rangle \approx \frac{1}{\sqrt{2}} \left( |1010\rangle - |0101\rangle \right)
+$$
+
 * **Entropy Scaling:** The orbital entanglement entropy reaches 100% of its theoretical upper bound:
-  $$S(\rho_A) \longrightarrow \ln(2) \approx 0.6931\text{ nats}$$
+
+$$
+S(\rho_A) \longrightarrow \ln(2) \approx 0.6931\text{ nats}
+$$
+
 * **Scientific Conclusion:** Hartree-Fock fidelity collapses to 50.8%. This proves that multi-reference quantum methods like VQE are fundamentally required for chemical dissociation.
 
 ---
@@ -285,19 +318,23 @@ Beyond the core benchmark, our team engineered 9 modular research subsystems in 
    * Injects CPMG (X-X) and XY4 (X-Y-X-Y) refocusing pulse sequences into idle routing periods, cancelling low-frequency dephasing.
 3. **Analytical Parameter-Shift Gradients (`src/parameter_shift.py`):**
    * Implements exact quantum differentiation without finite-difference approximation errors:
-     $$\frac{\partial \langle H \rangle}{\partial \theta_j} = \frac{\langle H(\theta + \frac{\pi}{2} e_j) \rangle - \langle H(\theta - \frac{\pi}{2} e_j) \rangle}{2}$$
+
+$$
+\frac{\partial \langle H \rangle}{\partial \theta_j} = \frac{\langle H(\theta + \frac{\pi}{2} e_j) \rangle - \langle H(\theta - \frac{\pi}{2} e_j) \rangle}{2}
+$$
+
 4. **Native Superconducting Pulse Basis Compilation (`src/pulse_basis.py`):**
    * Decomposes abstract CX gates into physical microwave drives: Echoed Cross-Resonance (`ECR` on IBM Falcon) and Controlled-Z (`CZ` on IBM Eagle).
 5. **Topology-Constrained ADAPT-VQE (`src/adapt_vqe.py`):**
    * Adaptively grows the ansatz operator-by-operator from an edge-constrained operator pool, ensuring zero SWAPs by construction.
 6. **Quantum Natural Gradient (`src/quantum_natural_gradient.py`):**
-   * Implements Riemannian steepest descent using the Fubini-Study Quantum Geometric Tensor g_ij(theta), avoiding barren plateaus.
+   * Implements Riemannian steepest descent using the Fubini-Study Quantum Geometric Tensor $g_{ij}(\theta)$, avoiding barren plateaus.
 7. **Complete Readout Calibration Inversion (`src/readout_mitigation.py`):**
-   * Inverts the 2^N x 2^N assignment transition matrix M_ij = P(i|j), boosting state fidelity from 96.0% to 99.8%.
+   * Inverts the $2^N \times 2^N$ assignment transition matrix $M_{ij} = P(i|j)$, boosting state fidelity from 96.0% to 99.8%.
 8. **Parasitic ZZ Crosstalk Suppression (`src/crosstalk.py`):**
-   * Models transmon parasitic coupling (xi_jk ≈ 120 kHz) and cancels spectator phase accumulation using echo pulses.
+   * Models transmon parasitic coupling ($\xi_{jk} \approx 120\text{ kHz}$) and cancels spectator phase accumulation using echo pulses.
 9. **Natural Orbital Entanglement Spectrum (`src/entanglement_spectrum.py`):**
-   * Diagonalizes the 1-RDM to extract natural orbital occupations (n_bonding ≈ 0.988, n_antibonding ≈ 0.012), proving electronic correlation.
+   * Diagonalizes the 1-RDM to extract natural orbital occupations ($n_{\text{bonding}} \approx 0.988, n_{\text{antibonding}} \approx 0.012$), proving electronic correlation.
 
 ---
 
@@ -306,11 +343,19 @@ Beyond the core benchmark, our team engineered 9 modular research subsystems in 
 To verify that the +14.3% CX penalty on heavy-hex hardware is a true topological effect rather than a transpiler artifact, we conducted multi-trial Monte Carlo evaluations across varying random seeds:
 
 * **Two-Sample Welch's t-test:**
-  $$t = -8.854, \quad p = 2.60 x 10^{-7}$$
-* **Significance Level:** p << 0.001, decisively rejecting the null hypothesis that heavy-hex routing overhead is random noise.
+
+$$
+t = -8.854, \quad p = 2.60 \times 10^{-7}
+$$
+
+* **Significance Level:** $p \ll 0.001$, decisively rejecting the null hypothesis that heavy-hex routing overhead is random noise.
 * **Effect Size (Cohen's d):**
-  $$d = 3.96$$
-  An effect size of 3.96 confirms an exceptionally strong, deterministic architectural penalty.
+
+$$
+d = 3.96
+$$
+
+An effect size of 3.96 confirms an exceptionally strong, deterministic architectural penalty.
 
 ---
 
