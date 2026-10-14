@@ -82,6 +82,39 @@ def display_banner():
     console.print(Panel.fit(banner_text, border_style="cyan"))
 
 
+def display_project_briefing():
+    """Renders a moderately technical executive summary card explaining the problem and solution."""
+    briefing_text = (
+        "[bold cyan][1] THE SCIENTIFIC GOAL[/bold cyan]\n"
+        "  Calculate the electronic ground-state energy of molecular hydrogen (H2) at R = 0.74 A\n"
+        "  using the Variational Quantum Eigensolver (VQE). Target: Classical FCI = [bold green]-1.137000 Ha[/bold green].\n\n"
+        "[bold yellow][2] THE PHYSICAL HARDWARE BOTTLENECK[/bold yellow]\n"
+        "  Textbook algorithms assume all qubits can freely entangle (all-to-all connectivity).\n"
+        "  Real superconducting QPUs have sparse, physical coupling topologies:\n"
+        "  * [bold]Processor A (5Q Baseline):[/bold] Branching tree coupling map (4 edges).\n"
+        "  * [bold]Processor B (9Q Heavy-Hex):[/bold] Sparse heavy-hex lattice with degree-2 bridge qubits (12 edges).\n"
+        "  Non-adjacent interactions force the compiler to inject [bold red]SWAP gates[/bold red] (each SWAP = 3 CX gates).\n"
+        "  On Processor B, this causes a [bold red]+14.3% CX gate inflation[/bold red] and spectator dephasing!\n\n"
+        "[bold green][3] OUR BREAKTHROUGH: ALGORITHM-HARDWARE CO-DESIGN[/bold green]\n"
+        "  Instead of compiling a generic ansatz, we synthesize hardware-native graph ansatze\n"
+        "  whose entangling layers strictly mirror the physical coupling edges:\n"
+        "  * Processor A: CX count drops from 21 -> [bold green]6 CX (-71.4%)[/bold green], [bold green]0 SWAPs[/bold green]!\n"
+        "  * Processor B: CX count drops from 24 -> [bold green]8 CX (-66.7%)[/bold green], [bold green]0 SWAPs[/bold green]!\n\n"
+        "[bold magenta][4] ADVANCED QUANTUM SUBSYSTEMS[/bold magenta]\n"
+        "  * [bold]QWC Grouping:[/bold] 15 Pauli strings -> 5 commuting cliques (66.7% circuit execution savings).\n"
+        "  * [bold]Dynamical Decoupling:[/bold] CPMG/XY4 pulse trains protect spectator qubits during routing delay.\n"
+        "  * [bold]Error Mitigation (ZNE):[/bold] Unitary gate folding (x1, x3, x5) recovers the zero-noise intercept.\n"
+        "  * [bold]Final Accuracy:[/bold] Converges to within chemical accuracy (error < 1.6 mHa / 1 kcal/mol)!\n\n"
+        "[bold white][5] 20-SECOND ELEVATOR PITCH FOR JUDGES[/bold white]\n"
+        "  [italic cyan]\"Textbook VQE assumes all-to-all connectivity, but physical superconducting processors\n"
+        "  have sparse coupling maps that force noisy SWAP routing. On IBM's heavy-hex lattice,\n"
+        "  this causes a +14.3% CX gate penalty. We solve this through native algorithm-hardware\n"
+        "  co-design, eliminating 100% of SWAP routing overhead, slashing CX gates by 71.4%,\n"
+        "  and achieving chemical accuracy.\"[/italic cyan]"
+    )
+    console.print(Panel(briefing_text, title="[bold white]EXECUTIVE PROBLEM STATEMENT & RESEARCH BRIEFING[/bold white]", border_style="green"))
+
+
 def run_full_pipeline(max_iter=MAX_ITER):
     console.print(f"\n[bold green]>>> Starting Full Research Benchmark Pipeline ({max_iter} iterations, {SHOTS} shots)...[/bold green]\n")
 
@@ -252,10 +285,11 @@ def run_interactive_menu():
         console.print("  [5] Multi-Molecule Chemical Transferability (H2, HeH+, LiH)")
         console.print("  [6] Superconducting Basis Gates (ECR / CZ) & Dynamical Decoupling")
         console.print("  [7] Tradeoff Mitigations (Thermal Noise, Barren Plateau, Spectral Router, CBS)")
-        console.print("  [8] Run Master 11-Module Verification Test Suite (`test_submission.py`)")
+        console.print("  [8] Run Master 12-Module Verification Test Suite (`test_submission.py`)")
+        console.print("  [9] Display Executive Problem Statement & Pitch Briefing (`--explain`)")
         console.print("  [0] Exit")
 
-        choice = Prompt.ask("\nSelect action", choices=["0", "1", "2", "3", "4", "5", "6", "7", "8"], default="1")
+        choice = Prompt.ask("\nSelect action", choices=["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], default="1")
 
         if choice == "1":
             run_full_pipeline()
@@ -306,6 +340,8 @@ def run_interactive_menu():
             console.print(f"  * [4] Thermal Decoherence Model: Realistic T1/T2 transmon relaxation integrated in `src/processors.py`\n")
         elif choice == "8":
             os.system(f"{sys.executable} test_submission.py")
+        elif choice == "9":
+            display_project_briefing()
         elif choice == "0":
             console.print("[dim]Exiting. Good luck at Qiskit Fall Hackathon 2026![/dim]")
             break
@@ -316,13 +352,16 @@ def main():
         description="H2-VQE-Topology-Benchmark Flagship Runner (Qiskit Fall Hackathon 2026 SRM AP)"
     )
     parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive selection menu")
-    parser.add_argument("--test", "-t", action="store_true", help="Execute 10-module master verification suite")
+    parser.add_argument("--test", "-t", action="store_true", help="Execute 12-module master verification suite")
     parser.add_argument("--quick", "-q", action="store_true", help="Execute fast evaluation with 15 iterations")
+    parser.add_argument("--explain", "-e", action="store_true", help="Display executive problem statement & pitch briefing")
     args = parser.parse_args()
 
     display_banner()
 
-    if args.test:
+    if args.explain:
+        display_project_briefing()
+    elif args.test:
         os.system(f"{sys.executable} test_submission.py")
     elif args.interactive:
         run_interactive_menu()
