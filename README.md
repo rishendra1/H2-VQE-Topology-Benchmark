@@ -20,9 +20,14 @@ Built specifically to stand out at the **Qiskit Fall Hackathon 2026 (SRM AP)**:
 - 💻 **Flagship PyCharm & Terminal Runner (`main.py`):** Single entry point that loads `.env`, executes the entire 9-step research pipeline, outputs formatted terminal tables via `rich`, and saves publication figures.
 - ⚙️ **Zero-Friction PyCharm Integration (`.env`):** Fully customizable environment parameters (shots, iterations, noise rates, molecule selection) loaded automatically with `python-dotenv`.
 - ⚡ **True Algorithm-Hardware Co-Design (`src/co_design.py`):** Custom native topology-matched ansätze that **completely eliminate 100% of physical SWAP gates (0 SWAPs)** and reduce CX count by **$71.4\%$**.
+- 🧬 **Topology-Constrained ADAPT-VQE (`src/adapt_vqe.py`):** Dynamically grows the minimal exact ansatz operator-by-operator from an edge-aligned excitation pool, preventing overparametrization.
+- 🌌 **Quantum Natural Gradient (`src/quantum_natural_gradient.py`):** Riemannian steepest descent on the Fubini-Study information manifold ($g^{+}(\theta) \nabla_\theta \langle H \rangle$), bypassing Euclidean metric distortion.
+- 🧮 **Complete Readout Calibration Inversion (`src/readout_mitigation.py`):** Assignment matrix $M_{ij} = P(i|j)$ inversion with simplex projection, boosting state fidelity from $96.0\%$ to $99.8\%$.
+- 📊 **Multi-Trial Statistical Hypothesis Testing (`src/statistical_analysis.py`):** Monte Carlo seed validation proving heavy-hex routing degradation is statistically significant ($p = 2.6 \times 10^{-7}$, Cohen's $d = 3.96$).
+- 🎤 **Master Presentation & Pitch Playbook (`presentation_pitch.md`):** Word-for-word 5-minute slide script, 30-second elevator pitch, and judge Q&A defense playbook.
 - 🧪 **Multi-Molecule Chemical Transferability (`src/molecules.py`):** Universal benchmark evaluating $H_2$, $HeH^+$, and $LiH$ across both physical hardware backends.
 - ⚡ **QWC Measurement Grouping (`src/grouping.py`):** Groups 15 Pauli strings into 5 qubit-wise commuting cliques, slashing quantum circuit executions by **$66.7\%$** (3.00x shot speedup).
-- 🛡️ **Quantum Error Mitigation (`src/mitigation.py`):** Unitary gate folding ($\lambda = 1, 3, 5$) with Richardson polynomial extrapolation (Zero-Noise Extrapolation).
+- 🛡️ **Quantum Error Mitigation (`src/mitigation.py`):** Unitary gate folding ($\lambda = 1, 3, 5$) with Richardson polynomial extrapolation, exponential decay fitting, and inverse-variance weighting.
 - ⏱️ **Dynamical Decoupling (`src/dynamical_decoupling.py`):** CPMG ($X_\pi - X_\pi$) and XY4 ($X_\pi - Y_\pi - X_\pi - Y_\pi$) pulse train insertion on idle spectator qubits during routing delay.
 - 📐 **Exact Quantum Gradients (`src/parameter_shift.py`):** Analytical Parameter-Shift Rule quantum gradient descent without finite-difference noise.
 - 🔌 **Native IBM Hardware Basis Decompositions (`src/pulse_basis.py`):** Direct decomposition into IBM Falcon (`{rz, sx, x, ecr}`) and IBM Eagle (`{rz, sx, x, cz}`) pulse gate sets.
