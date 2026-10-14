@@ -130,12 +130,13 @@ st.markdown("---")
 # -----------------------------------------------------------------------------
 # INTERACTIVE TABS
 # -----------------------------------------------------------------------------
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "🧩 Hardware Topology & Routing",
     "⚡ Live VQE Simulation",
     "🛡️ Error Mitigation (ZNE)",
     "📈 Potential Energy Surface (PES)",
-    "🔬 Quantum State & Entanglement"
+    "🔬 Quantum State & Entanglement",
+    "📄 Scientific Research Paper"
 ])
 
 
@@ -378,6 +379,27 @@ with tab5:
 
         st.write("**Dominant Computational Basis Components:**")
         st.json(state_metrics["dominant_basis_states"])
+
+# -----------------------------------------------------------------------------
+# TAB 6: SCIENTIFIC RESEARCH PAPER
+# -----------------------------------------------------------------------------
+with tab6:
+    st.subheader("Formal Scientific Research Paper")
+    st.markdown("*Prepared for submission & presentation at Qiskit Fall Hackathon 2026 (SRM AP).*")
+
+    paper_md_path = os.path.join(os.path.dirname(__file__), "paper", "paper.md")
+    if os.path.exists(paper_md_path):
+        with open(paper_md_path, "r", encoding="utf-8") as f:
+            paper_content = f.read()
+        st.markdown(paper_content)
+
+        col_d1, col_d2 = st.columns(2)
+        with col_d1:
+            with open(os.path.join(os.path.dirname(__file__), "paper", "paper.tex"), "r", encoding="utf-8") as ft:
+                st.download_button("📥 Download LaTeX Paper (.tex)", data=ft.read(), file_name="H2_VQE_CoDesign_Paper.tex", mime="text/x-tex")
+        with col_d2:
+            with open(os.path.join(os.path.dirname(__file__), "paper", "references.bib"), "r", encoding="utf-8") as fb:
+                st.download_button("📥 Download BibTeX Citations (.bib)", data=fb.read(), file_name="references.bib", mime="text/plain")
 
 st.markdown("---")
 st.markdown("*Built for Qiskit Fall Hackathon 2026 (SRM AP) | Powered by Qiskit v1.x / v2.x & Qiskit Aer*")
