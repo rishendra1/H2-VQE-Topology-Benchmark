@@ -1,11 +1,12 @@
-# 🏆 Qiskit Fall Hackathon 2026 — Master Presentation & Pitch Playbook
+# Qiskit Fall Hackathon 2026 -- Master Presentation & Pitch Playbook
 **Track 1:** Quantum Chemistry (Problem Statement PS-C1: $H_2$ Ground-State Energy Estimation)  
 **Host Institution:** SRM University AP (SRM AP)  
 **Project:** `H2-VQE-Topology-Benchmark`  
+**Project Lead & Presenter:** Rishendra  
 
 ---
 
-## ⏱️ 30-Second Elevator Pitch
+## 30-Second Elevator Pitch
 > *"Good morning, respected judges and evaluators. When scaling Variational Quantum Eigensolvers to physical quantum hardware, textbook algorithms assume all-to-all qubit connectivity. But real superconducting chips have sparse, constrained topologies—like IBM's heavy-hex lattice.*
 > 
 > *Our project, **H2-VQE-Topology-Benchmark**, conducts the first rigorous co-design study comparing a 5-qubit baseline against a 9-qubit heavy-hex sparse architecture. We prove that sparse heavy-hex topologies suffer a **+14.3% CX gate inflation** and severe routing dephasing.*
@@ -14,7 +15,7 @@
 
 ---
 
-## 🎤 5-Minute Slide-by-Slide Presentation Script
+## 5-Minute Slide-by-Slide Presentation Script
 
 ### Slide 1: Title & The Core Problem (0:00 - 0:45)
 * **Title:** Hardware-Algorithm Co-Design for Scalable Quantum Chemistry on Sparse Heavy-Hex Architectures
@@ -84,7 +85,7 @@
 
 ---
 
-## 🛡️ Judge Q&A Defense Playbook
+## Judge Q&A Defense Playbook
 
 ### Q1: *"Why did you use simulation instead of running on real IBM Quantum hardware?"*
 > **Answer:**  

@@ -1,6 +1,7 @@
 # Topology-Aware Algorithm-Hardware Co-Design for Electronic Structure Calculations on Superconducting Quantum Processors: A Benchmark on Heavy-Hex and Constrained Baseline Architectures
 
-**Authors:** H2-VQE-Topology-Benchmark Research Team  
+**Authors:** Rishendra (Lead Author) and Collaborative Research Team  
+**Affiliation:** SRM University AP  
 **Event:** Qiskit Fall Hackathon 2026 — SRM University AP (SRM AP)  
 **Track:** Track 1: Quantum Chemistry (Problem Statement PS-C1)  
 **Target Reference:** Full Configuration Interaction (FCI) = $-1.137000\text{ Hartree}$  

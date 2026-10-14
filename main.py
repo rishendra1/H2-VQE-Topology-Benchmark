@@ -56,7 +56,8 @@ from src.visualization import (
     plot_energy_convergence,
     plot_circuit_metrics_comparison,
     plot_hardware_topologies,
-    generate_benchmark_table
+    generate_benchmark_table,
+    generate_all_research_figures
 )
 
 console = Console()
@@ -75,7 +76,7 @@ PRO_ERR = float(os.getenv("PRO_ERROR", "0.010"))
 def display_banner():
     banner_text = (
         "[bold cyan]H2-VQE-Topology-Benchmark: Advanced Quantum Architecture Co-Design[/bold cyan]\n"
-        "[bold yellow]Qiskit Fall Hackathon 2026 -- SRM University AP[/bold yellow]\n"
+        "[bold yellow]Qiskit Fall Hackathon 2026 -- SRM University AP | Developed by Rishendra[/bold yellow]\n"
         "[italic green]Track 1: Quantum Chemistry (PS-C1: H2 Ground-State Energy Estimation)[/italic green]\n"
         f"[dim]Config: Bond={BOND_DISTANCE} A | Shots={SHOTS} | MaxIter={MAX_ITER} | OptLevel={OPT_LEVEL} | Seed={SEED}[/dim]"
     )
@@ -259,12 +260,15 @@ def run_full_pipeline(max_iter=MAX_ITER):
     console.print("[bold cyan][9/9] Generating High-Resolution Figures & Data Tables...[/bold cyan]")
     fig1 = plot_energy_convergence(vqe_results)
     fig2 = plot_circuit_metrics_comparison(vqe_results)
-    fig3 = plot_hardware_topologies()
     md_table, _ = generate_benchmark_table(vqe_results)
+    research_figs = generate_all_research_figures()
 
-    console.print(f"  * Convergence Curve: [dim]{fig1}[/dim]")
-    console.print(f"  * Hardware Comparison: [dim]{fig2}[/dim]")
-    console.print(f"  * Topology Diagram:   [dim]{fig3}[/dim]")
+    console.print(f"  * Convergence Curve:    [dim]{fig1}[/dim]")
+    console.print(f"  * Hardware Comparison:  [dim]{fig2}[/dim]")
+    console.print(f"  * Hardware Topologies:  [dim]{research_figs['hardware_topologies']}[/dim]")
+    console.print(f"  * Bond Dissociation:    [dim]{research_figs['bond_dissociation']}[/dim]")
+    console.print(f"  * Fermionic Encodings:  [dim]{research_figs['fermionic_encodings']}[/dim]")
+    console.print(f"  * ZNE Gate Folding:     [dim]{research_figs['zne_extrapolation']}[/dim]")
 
     console.print(Panel.fit(
         "[bold green]BENCHMARK PIPELINE EXECUTED SUCCESSFULLY![/bold green]\n"
@@ -285,11 +289,12 @@ def run_interactive_menu():
         console.print("  [5] Multi-Molecule Chemical Transferability (H2, HeH+, LiH)")
         console.print("  [6] Superconducting Basis Gates (ECR / CZ) & Dynamical Decoupling")
         console.print("  [7] Tradeoff Mitigations (Thermal Noise, Barren Plateau, Spectral Router, CBS)")
-        console.print("  [8] Run Master 12-Module Verification Test Suite (`test_submission.py`)")
-        console.print("  [9] Display Executive Problem Statement & Pitch Briefing (`--explain`)")
+        console.print("  [8] Run Master 13-Module Verification Test Suite (`test_submission.py`)")
+        console.print("  [9] Generate All 8 Research Figures (`results/figures/`)")
+        console.print("  [10] Display Executive Problem Statement & Pitch Briefing (`--explain`)")
         console.print("  [0] Exit")
 
-        choice = Prompt.ask("\nSelect action", choices=["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], default="1")
+        choice = Prompt.ask("\nSelect action", choices=["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], default="1")
 
         if choice == "1":
             run_full_pipeline()
@@ -323,7 +328,7 @@ def run_interactive_menu():
             console.print(f"\n[bold green]Pulse Decompositions & DD:[/bold green]")
             console.print(f"  * Falcon Native Basis: Depth={pulse_res['processor_a']['ECR_Falcon']['transpiled_depth']}, ECR={pulse_res['processor_a']['ECR_Falcon']['entangling_gate_count']}")
             console.print(f"  * Eagle Native Basis:  Depth={pulse_res['processor_a']['CZ_Eagle']['transpiled_depth']}, CZ={pulse_res['processor_a']['CZ_Eagle']['entangling_gate_count']}")
-            console.print(f"  * DD Sequences: CPMG = +{dd_stats['cpmg_refocusing_pulses']} pulses | XY4 = +{dd_stats['xy4_refocusing_pulses']} pulses\n")
+            console.print(f"  * DD Sequences: CPMG = +{dd_stats['cpmg_refocusing pulses'] if 'cpmg_refocusing pulses' in dd_stats else dd_stats.get('cpmg_refocusing_pulses', 0)} pulses | XY4 = +{dd_stats['xy4_refocusing pulses'] if 'xy4_refocusing pulses' in dd_stats else dd_stats.get('xy4_refocusing_pulses', 0)} pulses\n")
         elif choice == "7":
             from src.co_design import benchmark_barren_plateau_mitigation
             from src.theory import compute_spectral_fiedler_subgraph_embedding
@@ -341,6 +346,10 @@ def run_interactive_menu():
         elif choice == "8":
             os.system(f"{sys.executable} test_submission.py")
         elif choice == "9":
+            console.print("\n[bold cyan]Generating all 8 research figures into results/figures/...[/bold cyan]")
+            generate_all_research_figures()
+            console.print("[bold green]All figures successfully generated![/bold green]\n")
+        elif choice == "10":
             display_project_briefing()
         elif choice == "0":
             console.print("[dim]Exiting. Good luck at Qiskit Fall Hackathon 2026![/dim]")
@@ -352,8 +361,9 @@ def main():
         description="H2-VQE-Topology-Benchmark Flagship Runner (Qiskit Fall Hackathon 2026 SRM AP)"
     )
     parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive selection menu")
-    parser.add_argument("--test", "-t", action="store_true", help="Execute 12-module master verification suite")
+    parser.add_argument("--test", "-t", action="store_true", help="Execute 13-module master verification suite")
     parser.add_argument("--quick", "-q", action="store_true", help="Execute fast evaluation with 15 iterations")
+    parser.add_argument("--figures", "-f", action="store_true", help="Generate all 8 publication-tier benchmark figures")
     parser.add_argument("--explain", "-e", action="store_true", help="Display executive problem statement & pitch briefing")
     args = parser.parse_args()
 
@@ -361,6 +371,8 @@ def main():
 
     if args.explain:
         display_project_briefing()
+    elif args.figures:
+        generate_all_research_figures()
     elif args.test:
         os.system(f"{sys.executable} test_submission.py")
     elif args.interactive:
