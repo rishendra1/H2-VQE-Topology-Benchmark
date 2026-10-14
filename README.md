@@ -3,7 +3,7 @@
 
 **Event:** Qiskit Fall Hackathon 2026 -- SRM University AP  
 **Track:** Track 1: Quantum Chemistry (Problem Statement PS-C1)  
-**Target Molecule:** Electronic Ground-State Energy of Molecular Hydrogen ($H_2$ at equilibrium $R = 0.74\text{ \AA}$)  
+**Target Molecule:** Electronic Ground-State Energy of Molecular Hydrogen ($H_2$ at equilibrium $R = 0.74\text{ Å}$)  
 **Reference Benchmark:** Classical Full Configuration Interaction (FCI) = $-1.137000\text{ Hartree}$  
 **Chemical Accuracy Threshold:** $1\text{ kcal/mol} \approx 1.5936\text{ mHartree} \approx 0.0016\text{ Hartree}$  
 **Project Lead & Lead Developer:** Rishendra  
@@ -54,7 +54,7 @@ $$H = \sum_{p, q} h_{pq} a_p^\dagger a_q + \frac{1}{2} \sum_{p, q, r, s} h_{pqrs
 
 where $h_{pq}$ represents the one-electron kinetic and electron-nuclear attraction integrals, and $h_{pqrs}$ represents the two-electron Coulomb and exchange repulsion integrals.
 
-For molecular hydrogen ($H_2$) at equilibrium bond length ($R = 0.74\text{ \AA}$) in the minimal STO-3G basis, the physical system consists of 2 spatial orbitals ($1\sigma_g$ bonding and $1\sigma_u^*$ antibonding), which expand into 4 spin-orbitals:
+For molecular hydrogen ($H_2$) at equilibrium bond length ($R = 0.74\text{ Å}$) in the minimal STO-3G basis, the physical system consists of 2 spatial orbitals ($1\sigma_g$ bonding and $1\sigma_u^*$ antibonding), which expand into 4 spin-orbitals:
 $$\{|\phi_0\rangle = |1\sigma_g \uparrow\rangle, |\phi_1\rangle = |1\sigma_g \downarrow\rangle, |\phi_2\rangle = |1\sigma_u^* \uparrow\rangle, |\phi_3\rangle = |1\sigma_u^* \downarrow\rangle\}$$
 
 Applying the standard Jordan-Wigner transformation:
@@ -182,14 +182,14 @@ For scale factors $\{1, 3, 5\}$, the exact Richardson weights are $\gamma_1 = \f
 To prove that our co-design benchmark is not restricted to a single artificial equilibrium point, we implemented a full Potential Energy Surface (PES) dissociation scanner and extended the Hamiltonian mapper to multiple chemical species.
 
 ### 1. Potential Energy Surface (PES) Dissociation Curve
-We calculated the molecular dissociation profile across internuclear separations from $R = 0.5\text{ \AA}$ to $R = 2.0\text{ \AA}$.
+We calculated the molecular dissociation profile across internuclear separations from $R = 0.5\text{ Å}$ to $R = 2.0\text{ Å}$.
 
 ![Potential Energy Surface](results/figures/h2_potential_energy_surface.png)
 *Figure 5: Potential Energy Surface (PES) dissociation curve of molecular H2, comparing VQE ground states against classical FCI across internuclear distances R from 0.5 to 2.0 Angstroms.*
 
 The resulting potential curve correctly reproduces:
-* The strongly repulsive nuclear core at $R < 0.6\text{ \AA}$.
-* The bound physical ground-state minimum at $R = 0.74\text{ \AA}$ ($E = -1.1370\text{ Ha}$).
+* The strongly repulsive nuclear core at $R < 0.6\text{ Å}$.
+* The bound physical ground-state minimum at $R = 0.74\text{ Å}$ ($E = -1.1370\text{ Ha}$).
 * Smooth asymptotic dissociation toward two isolated Hydrogen atoms as $R \to \infty$.
 
 ### 2. Multi-Molecule Transferability Catalog
@@ -217,7 +217,7 @@ In physical quantum chemistry experiments, the choice of classical optimizer dic
 
 A fundamental question in quantum chemistry is: *Why is VQE strictly necessary if classical mean-field (Hartree-Fock) is efficient?*
 
-To answer this, we modeled bond cleavage up to $R = 3.0\text{ \AA}$ and tracked the bipartite orbital entanglement entropy $S(\rho_A)$ between bonding and antibonding spatial orbitals:
+To answer this, we modeled bond cleavage up to $R = 3.0\text{ Å}$ and tracked the bipartite orbital entanglement entropy $S(\rho_A)$ between bonding and antibonding spatial orbitals:
 
 $$S(\rho_A) = -\text{Tr}(\rho_A \ln \rho_A)$$
 
@@ -225,8 +225,8 @@ $$S(\rho_A) = -\text{Tr}(\rho_A \ln \rho_A)$$
 *Figure 7: Chemical bond cleavage and orbital entanglement entropy scaling. Left axis: Ground-state energy E(R) (Hartree). Right axis: Bipartite orbital entanglement entropy S(rho_A) (nats), scaling from 0.07 at equilibrium to the maximal ln(2) = 0.6931 nats Bell-state bound at dissociation.*
 
 ### Physics of Static Correlation
-* **At Equilibrium ($R = 0.74\text{ \AA}$):** The HOMO-LUMO gap is large ($\sim 0.75\text{ Ha}$). The Hartree-Fock state $|1010\rangle$ represents $98.7\%$ of the true wavefunction. Entanglement entropy is low ($S \approx 0.0697\text{ nats}$). Single-determinant classical methods work well.
-* **At Dissociation ($R \ge 2.0\text{ \AA}$):** The bonding and antibonding orbitals become degenerate. Static correlation explodes, and the wavefunction becomes an equal-weight, maximally entangled Bell-like superposition:
+* **At Equilibrium ($R = 0.74\text{ Å}$):** The HOMO-LUMO gap is large ($\sim 0.75\text{ Ha}$). The Hartree-Fock state $|1010\rangle$ represents $98.7\%$ of the true wavefunction. Entanglement entropy is low ($S \approx 0.0697\text{ nats}$). Single-determinant classical methods work well.
+* **At Dissociation ($R \ge 2.0\text{ Å}$):** The bonding and antibonding orbitals become degenerate. Static correlation explodes, and the wavefunction becomes an equal-weight, maximally entangled Bell-like superposition:
   $$|\psi\rangle \approx \frac{1}{\sqrt{2}} (|1010\rangle - |0101\rangle)$$
 * **Entropy Scaling:** The orbital entanglement entropy reaches $100\%$ of its theoretical upper bound:
   $$S(\rho_A) \longrightarrow \ln(2) \approx 0.6931\text{ nats}$$
