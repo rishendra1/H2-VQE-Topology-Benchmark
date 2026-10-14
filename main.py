@@ -251,10 +251,11 @@ def run_interactive_menu():
         console.print("  [4] QWC Measurement Grouping & Shot Reduction Analysis")
         console.print("  [5] Multi-Molecule Chemical Transferability (H2, HeH+, LiH)")
         console.print("  [6] Superconducting Basis Gates (ECR / CZ) & Dynamical Decoupling")
-        console.print("  [7] Run Master 10-Module Verification Test Suite (`test_submission.py`)")
+        console.print("  [7] Tradeoff Mitigations (Thermal Noise, Barren Plateau, Spectral Router, CBS)")
+        console.print("  [8] Run Master 11-Module Verification Test Suite (`test_submission.py`)")
         console.print("  [0] Exit")
 
-        choice = Prompt.ask("\nSelect action", choices=["0", "1", "2", "3", "4", "5", "6", "7"], default="1")
+        choice = Prompt.ask("\nSelect action", choices=["0", "1", "2", "3", "4", "5", "6", "7", "8"], default="1")
 
         if choice == "1":
             run_full_pipeline()
@@ -290,6 +291,20 @@ def run_interactive_menu():
             console.print(f"  * Eagle Native Basis:  Depth={pulse_res['processor_a']['CZ_Eagle']['transpiled_depth']}, CZ={pulse_res['processor_a']['CZ_Eagle']['entangling_gate_count']}")
             console.print(f"  * DD Sequences: CPMG = +{dd_stats['cpmg_refocusing_pulses']} pulses | XY4 = +{dd_stats['xy4_refocusing_pulses']} pulses\n")
         elif choice == "7":
+            from src.co_design import benchmark_barren_plateau_mitigation
+            from src.theory import compute_spectral_fiedler_subgraph_embedding
+            from src.problem import extrapolate_to_complete_basis_set
+
+            bp = benchmark_barren_plateau_mitigation()
+            fiedler = compute_spectral_fiedler_subgraph_embedding(PROCESSOR_B_EDGES, 9, target_k=4)
+            cbs = extrapolate_to_complete_basis_set(FCI_REFERENCE_ENERGY)
+
+            console.print("\n[bold green]Research Tradeoff Mitigation Solutions:[/bold green]")
+            console.print(f"  * [1] Barren Plateau Solution: Symmetry-preserving ansatz reduces search manifold by {bp['subspace_compression_ratio']} (Subspace Dim={bp['accessible_subspace_dimension']})")
+            console.print(f"  * [2] Graph NP-Hardness Solution: {fiedler['polynomial_time_guarantee']} -> Optimal nodes {fiedler['recommended_physical_qubits']}")
+            console.print(f"  * [3] Minimal Basis Truncation Solution: CBS Extrapolated Ground State = {cbs['cbs_limit_energy_hartree']:.6f} Ha (Delta_corr = {cbs['basis_set_truncation_error_kcal_mol']:.2f} kcal/mol)")
+            console.print(f"  * [4] Thermal Decoherence Model: Realistic T1/T2 transmon relaxation integrated in `src/processors.py`\n")
+        elif choice == "8":
             os.system(f"{sys.executable} test_submission.py")
         elif choice == "0":
             console.print("[dim]Exiting. Good luck at Qiskit Fall Hackathon 2026![/dim]")

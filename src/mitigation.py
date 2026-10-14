@@ -130,11 +130,62 @@ def execute_with_zne(
     # Richardson polynomial extrapolation
     richardson_zne = richardson_extrapolation(scale_factors, measured_energies)
 
+    # Physics-motivated Exponential extrapolation (mitigates high-scale polynomial divergence)
+    exponential_zne = exponential_extrapolation(scale_factors, measured_energies)
+
+    # Inverse-variance weighted extrapolation (mitigates statistical shot variance amplification)
+    weighted_zne = weighted_richardson_extrapolation(scale_factors, measured_energies, shots=shots)
+
     return {
         "scale_factors": scale_factors,
         "measured_energies": measured_energies,
         "linear_extrapolated_energy": linear_zne,
         "richardson_extrapolated_energy": richardson_zne,
+        "exponential_extrapolated_energy": exponential_zne,
+        "weighted_extrapolated_energy": weighted_zne,
         "raw_unmitigated_energy": measured_energies[0],
         "mitigation_delta_hartree": richardson_zne - measured_energies[0],
     }
+
+
+def exponential_extrapolation(scale_factors: List[float], energies: List[float]) -> float:
+    """Performs physics-motivated exponential extrapolation E(lambda) = E0 + A * (1 - exp(-gamma * lambda)).
+
+    Under depolarizing and thermal noise, expectation values decay exponentially
+    with gate repetition. Exponential fitting provides a monotonic physical trajectory
+    that prevents polynomial run-away errors.
+    """
+    scales = np.array(scale_factors, dtype=float)
+    vals = np.array(energies, dtype=float)
+
+    def exp_func(x, e0, a, gamma):
+        return e0 + a * (1.0 - np.exp(-gamma * x))
+
+    try:
+        p0 = [vals[0] - (vals[-1] - vals[0]), vals[-1] - vals[0], 0.3]
+        popt, _ = curve_fit(exp_func, scales, vals, p0=p0, maxfev=5000)
+        return float(popt[0])
+    except Exception:
+        # Fallback to linear
+        return float(np.polyval(np.polyfit(scales[:2], vals[:2], deg=1), 0.0))
+
+
+def weighted_richardson_extrapolation(
+    scale_factors: List[float],
+    energies: List[float],
+    shots: int = 4096
+) -> float:
+    """Performs inverse-variance weighted polynomial extrapolation.
+
+    Since higher noise scale factors (lambda = 5) exhibit greater statistical
+    variance, weighting by w_i = 1 / sqrt(lambda / shots) prevents high-scale
+    sampling fluctuations from dominating the zero-noise intercept.
+    """
+    scales = np.array(scale_factors, dtype=float)
+    vals = np.array(energies, dtype=float)
+
+    weights = 1.0 / np.sqrt(scales / float(shots))
+    deg = min(2, len(scales) - 1)
+    poly = np.polyfit(scales, vals, deg=deg, w=weights)
+    return float(np.polyval(poly, 0.0))
+

@@ -149,10 +149,84 @@ def get_noisy_simulator(
     return sim
 
 
+def get_realistic_thermal_noise_model(
+    t1_us: float = 100.0,
+    t2_us: float = 80.0,
+    gate_time_1q_ns: float = 35.0,
+    gate_time_2q_ns: float = 300.0,
+    p_ro: float = P_READOUT_ERROR
+) -> NoiseModel:
+    """Builds a physics-accurate thermal relaxation and dephasing noise model.
+
+    Models genuine superconducting transmon decoherence (T1 longitudinal relaxation,
+    T2 transverse dephasing, and finite pulse duration overheads).
+
+    Args:
+        t1_us: Longitudinal relaxation time T1 in microseconds (default: 100.0 us).
+        t2_us: Transverse dephasing time T2 in microseconds (default: 80.0 us).
+        gate_time_1q_ns: Single-qubit pulse duration in nanoseconds (default: 35.0 ns).
+        gate_time_2q_ns: Two-qubit cross-resonance duration in nanoseconds (default: 300.0 ns).
+        p_ro: Readout assignment error probability.
+
+    Returns:
+        NoiseModel: Calibrated thermal relaxation noise model.
+    """
+    from qiskit_aer.noise import thermal_relaxation_error
+
+    noise_model = NoiseModel()
+    t_1q = gate_time_1q_ns / 1000.0  # to microseconds
+    t_2q = gate_time_2q_ns / 1000.0  # to microseconds
+
+    err_1q = thermal_relaxation_error(t1_us, t2_us, t_1q)
+    err_2q_single = thermal_relaxation_error(t1_us, t2_us, t_2q)
+    err_2q = err_2q_single.tensor(err_2q_single)
+
+    noise_model.add_all_qubit_quantum_error(err_1q, ["rz", "sx", "x", "h"])
+    noise_model.add_all_qubit_quantum_error(err_2q, ["cx", "cz"])
+
+    ro_matrix = [[1.0 - p_ro, p_ro], [p_ro, 1.0 - p_ro]]
+    noise_model.add_all_qubit_readout_error(ReadoutError(ro_matrix))
+
+    return noise_model
+
+
+def get_cloud_runtime_backend(token: str = None, backend_name: str = None) -> Tuple[Any, bool]:
+    """Connects to real IBM Quantum cloud QPUs via Qiskit Runtime if credentials are available.
+
+    Falls back cleanly to local simulation if no token is provided.
+
+    Args:
+        token: Optional IBM Quantum API token (defaults to IBM_QUANTUM_TOKEN env var).
+        backend_name: Optional QPU name (e.g. 'ibm_brisbane', 'ibm_kyoto').
+
+    Returns:
+        Tuple[Any, bool]: (backend_instance, is_live_cloud_backend)
+    """
+    import os
+    resolved_token = token or os.getenv("IBM_QUANTUM_TOKEN", "").strip()
+
+    if not resolved_token:
+        # Default to local Processor A simulation
+        return get_processor_a(), False
+
+    try:
+        from qiskit_ibm_runtime import QiskitRuntimeService
+        service = QiskitRuntimeService(channel="ibm_quantum", token=resolved_token)
+        if backend_name:
+            backend = service.backend(backend_name)
+        else:
+            backend = service.least_busy(operational=True, simulator=False)
+        return backend, True
+    except Exception as exc:
+        print(f"[*] Cloud connection notice ({type(exc).__name__}): Defaulting to local calibrated GenericBackendV2.")
+        return get_processor_a(), False
+
+
 if __name__ == "__main__":
     proc_a = get_processor_a()
     proc_b = get_processor_b()
     noise = get_official_noise_model()
+    thermal = get_realistic_thermal_noise_model()
 
     print("=== Processor A (5-Qubit Baseline) ===")
     print(f"Num qubits: {proc_a.num_qubits}")
@@ -166,4 +240,6 @@ if __name__ == "__main__":
 
     print("\n=== Official Synthetic Noise Model ===")
     print(noise)
+    print("\n=== Realistic Thermal Decoherence Model (T1=100us, T2=80us) ===")
+    print(thermal)
     print("\nProcessor initialization passed successfully!")

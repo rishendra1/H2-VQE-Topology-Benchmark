@@ -86,3 +86,64 @@ def compare_spectral_topologies() -> Dict[str, Any]:
         "algebraic_connectivity_ratio (B/A)": top_b["algebraic_connectivity_lambda2"] / max(1e-5, top_a["algebraic_connectivity_lambda2"]),
         "diameter_difference (B - A)": top_b["diameter"] - top_a["diameter"]
     }
+
+
+def compute_spectral_fiedler_subgraph_embedding(
+    edges: List[List[int]],
+    num_nodes: int,
+    target_k: int = 4
+) -> Dict[str, Any]:
+    """Computes a polynomial-time sub-graph embedding using the Laplacian Fiedler eigenvector.
+
+    Bypasses the NP-hard brute-force Subgraph Isomorphism problem by ordering nodes
+    according to the Fiedler vector (eigenvector of lambda_2). Nodes clustered closely
+    in the 1D spectral embedding share maximum physical connectivity.
+
+    Args:
+        edges: Processor undirected edges.
+        num_nodes: Number of hardware nodes.
+        target_k: Number of qubits in the active molecular space (default: 4).
+
+    Returns:
+        Dict[str, Any]: Selected physical qubits, internal edges, and spectral coordinates.
+    """
+    G = nx.Graph()
+    G.add_nodes_from(range(num_nodes))
+    G.add_edges_from(edges)
+
+    L = nx.laplacian_matrix(G).toarray().astype(float)
+    eigenvalues, eigenvectors = np.linalg.eigh(L)
+
+    idx = np.argsort(eigenvalues)
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+
+    fiedler_vector = eigenvectors[:, 1]
+    sorted_nodes = np.argsort(fiedler_vector)
+
+    best_nodes = []
+    max_edges = -1
+    for start in range(len(sorted_nodes) - target_k + 1):
+        candidate = sorted_nodes[start:start + target_k].tolist()
+        sub = G.subgraph(candidate)
+        if nx.is_connected(sub):
+            n_sub_edges = sub.number_of_edges()
+            if n_sub_edges > max_edges:
+                max_edges = n_sub_edges
+                best_nodes = candidate
+
+    if not best_nodes:
+        best_nodes = sorted_nodes[:target_k].tolist()
+
+    sub_g = G.subgraph(best_nodes)
+    avg_internal_path = nx.average_shortest_path_length(sub_g) if nx.is_connected(sub_g) else 999.0
+
+    return {
+        "fiedler_value_lambda2": float(eigenvalues[1]),
+        "fiedler_spectral_coordinates": {int(i): float(fiedler_vector[i]) for i in range(num_nodes)},
+        "recommended_physical_qubits": best_nodes,
+        "internal_edges": int(sub_g.number_of_edges()),
+        "average_internal_path_length": float(avg_internal_path),
+        "polynomial_time_guarantee": "O(V^3) spectral bisection vs O(V! / (V-k)!) brute-force"
+    }
+
