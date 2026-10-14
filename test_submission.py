@@ -122,13 +122,20 @@ def run_full_validation():
 
     # 8. Analytical Parameter-Shift Rule
     print("\n[MODULE 8] Parameter-Shift Rule Exact Quantum Gradients (src/parameter_shift.py)")
-    t_circ = mA["transpiled_depth"]
+    from qiskit import transpile
+    t_circ = transpile(ansatz, backend=proc_a, optimization_level=1, seed_transpiler=42)
+    H_layout = H.apply_layout(t_circ.layout)
     grad, e_curr = compute_parameter_shift_gradient(
-        circuit=mA["transpiled_depth"], observable=H.apply_layout(proc_a),
-        parameters=np.zeros(24), noise_model=None, shots=4096
-    ) if False else (np.array([0.05, -0.03, 0.08]), -0.92)
-    print(f"  * Parameter-Shift Gradient Vector (sample): {np.round(grad, 4)}")
+        circuit=t_circ,
+        observable=H_layout,
+        parameters=np.zeros(len(t_circ.parameters)),
+        noise_model=None,
+        shots=4096,
+        seed=42
+    )
+    print(f"  * Parameter-Shift Gradient Vector (sample): {np.round(grad[:3], 4)}")
     print(f"  * Gradient Norm ||grad E||: {np.linalg.norm(grad):.4f}")
+    assert len(grad) == len(t_circ.parameters)
     print("  -> PASSED: Exact analytical quantum differentiation verified")
 
     # 9. Native Superconducting Basis Sets (ECR / CZ)
