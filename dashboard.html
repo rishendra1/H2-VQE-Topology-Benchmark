@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>H2-VQE-Topology-Benchmark | Interactive Research Dashboard</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+      --purple: #bc8cff;
+      --text: #c9d1d9;
+      --text-bright: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 24px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .badge-primary { background: rgba(88, 166, 255, 0.15); color: var(--accent); border: 1px solid rgba(88, 166, 255, 0.4); }
+    .badge-green { background: rgba(63, 185, 80, 0.15); color: var(--green); border: 1px solid rgba(63, 185, 80, 0.4); }
+    .badge-purple { background: rgba(188, 140, 255, 0.15); color: var(--purple); border: 1px solid rgba(188, 140, 255, 0.4); }
+    h1 { color: var(--text-bright); font-size: 2rem; margin: 12px 0 6px; }
+    .subtitle { color: #8b949e; font-size: 1.05rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-bottom: 30px; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .card-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8b949e; margin-bottom: 8px; }
+    .card-metric { font-size: 2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 6px; }
+    .card-sub { font-size: 0.85rem; }
+    .text-green { color: var(--green); }
+    .text-accent { color: var(--accent); }
+    .text-yellow { color: var(--yellow); }
+    .text-purple { color: var(--purple); }
+    .section-title {
+      font-size: 1.4rem;
+      color: var(--text-bright);
+      margin: 32px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    th { background: #21262d; color: var(--text-bright); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    .figure-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 32px; }
+    .figure-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .figure-card img { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--border); }
+    .figure-caption { padding: 14px; font-size: 0.88rem; color: #8b949e; }
+    .figure-caption strong { color: var(--text-bright); display: block; margin-bottom: 4px; font-size: 0.95rem; }
+    pre {
+      background: #161b22;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.85rem;
+      color: var(--text-bright);
+      margin-bottom: 20px;
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      margin-top: 40px;
+      font-size: 0.85rem;
+      color: #8b949e;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <span class="badge badge-primary">Qiskit Fall Hackathon 2026</span>
+        <span class="badge badge-green">Track 1: Quantum Chemistry (PS-C1)</span>
+        <span class="badge badge-purple">SRM University AP</span>
+      </div>
+      <h1>H2-VQE-Topology-Benchmark: Algorithm-Hardware Co-Design</h1>
+      <p class="subtitle">Benchmarking 5-Qubit Tree vs 9-Qubit Heavy-Hex Architectures under Noisy Quantum Chemistry Execution | Lead: <strong>Rishendra</strong></p>
+    </header>
+
+    <!-- Key Metrics Grid -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">Heavy-Hex Routing Penalty</div>
+        <div class="card-metric text-yellow">+14.3% CX</div>
+        <div class="card-sub">Proc B (24 CX) vs Proc A (21 CX) on unconstrained ansatz</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Co-Design SWAP Elimination</div>
+        <div class="card-metric text-green">0 SWAPs</div>
+        <div class="card-sub">-71.4% CX on Proc A (6 CX) | -66.7% CX on Proc B (8 CX)</div>
+      </div>
+      <div class="card">
+        <div class="card-title">QWC Measurement Grouping</div>
+        <div class="card-metric text-accent">66.7% Saved</div>
+        <div class="card-sub">15 Pauli strings partitioned into 5 commuting cliques (3.0x shot speedup)</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Statistical Significance</div>
+        <div class="card-metric text-purple">p = 2.6 &times; 10<sup>-7</sup></div>
+        <div class="card-sub">Welch's t = -8.854, Cohen's d = 3.96 (Huge effect size across 10 seeds)</div>
+      </div>
+    </div>
+
+    <!-- Benchmark Comparison Table -->
+    <h2 class="section-title">Hardware Routing & Compilation Overhead (Level 1, Seed 42)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Strategy & Architecture</th>
+          <th>Physical Qubits</th>
+          <th>Total Gates</th>
+          <th>Transpiled Depth</th>
+          <th>2Q CX Count</th>
+          <th>SWAP Overhead</th>
+          <th>Routing Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Processor A (5Q Tree Baseline)</strong> — Naive TwoLocal</td>
+          <td>5</td>
+          <td>85</td>
+          <td>48</td>
+          <td>21</td>
+          <td>+9 CX (~3 SWAPs)</td>
+          <td>Baseline</td>
+        </tr>
+        <tr>
+          <td><strong>Processor B (9Q Heavy-Hex)</strong> — Naive TwoLocal</td>
+          <td>9</td>
+          <td>88</td>
+          <td>51</td>
+          <td>24</td>
+          <td>+12 CX (~4 SWAPs)</td>
+          <td><span class="text-yellow"><strong>+14.3% CX (+3 CX)</strong></span></td>
+        </tr>
+        <tr>
+          <td><strong>Processor A Native Co-Design</strong></td>
+          <td>5</td>
+          <td>44</td>
+          <td>23</td>
+          <td>6</td>
+          <td><strong>0 SWAPs</strong></td>
+          <td><span class="text-green"><strong>-71.4% CX (-15 CX)</strong></span></td>
+        </tr>
+        <tr>
+          <td><strong>Processor B Native Co-Design</strong></td>
+          <td>9</td>
+          <td>48</td>
+          <td>25</td>
+          <td>8</td>
+          <td><strong>0 SWAPs</strong></td>
+          <td><span class="text-green"><strong>-66.7% CX (-16 CX)</strong></span></td>
+        </tr>
+        <tr>
+          <td><strong>Exact Singlet Co-Design (Both Processors)</strong></td>
+          <td>4</td>
+          <td>9</td>
+          <td>7</td>
+          <td>3</td>
+          <td><strong>0 SWAPs</strong></td>
+          <td><span class="text-accent"><strong>Exact FCI (&Delta; = 10<sup>-14</sup> Ha)</strong></span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Research Figures Gallery -->
+    <h2 class="section-title">Research Figures & Benchmark Visualizations</h2>
+    <div class="figure-grid">
+      <div class="figure-card">
+        <img src="results/figures/hardware_topologies.png" alt="Hardware Topologies">
+        <div class="figure-caption">
+          <strong>Physical Coupling Topologies</strong>
+          Processor A (5-qubit branching tree) vs Processor B (9-qubit heavy-hex sparse lattice with bridging qubits).
+        </div>
+      </div>
+      <div class="figure-card">
+        <img src="results/figures/circuit_metrics_comparison.png" alt="Circuit Metrics Comparison">
+        <div class="figure-caption">
+          <strong>Routing Overhead vs Co-Design Savings</strong>
+          Side-by-side comparison of depth, native CX counts, and 100% SWAP elimination across topologies.
+        </div>
+      </div>
+      <div class="figure-card">
+        <img src="results/figures/energy_convergence.png" alt="VQE Energy Convergence">
+        <div class="figure-caption">
+          <strong>Noisy VQE Convergence Trajectory</strong>
+          Closed-loop optimization under 0.1% 1Q, 0.5% CX, and 1.0% readout noise showing routing degradation.
+        </div>
+      </div>
+      <div class="figure-card">
+        <img src="results/figures/zne_extrapolation.png" alt="Zero-Noise Extrapolation">
+        <div class="figure-caption">
+          <strong>Zero-Noise Extrapolation (ZNE)</strong>
+          Digital gate folding (&lambda; = 1, 3, 5) with Richardson, Exponential, and Weighted polynomial fits.
+        </div>
+      </div>
+      <div class="figure-card">
+        <img src="results/figures/bond_dissociation_entanglement.png" alt="Bond Dissociation & Entanglement">
+        <div class="figure-caption">
+          <strong>Bond Dissociation & Entanglement Scaling</strong>
+          Von Neumann bipartite entanglement entropy S(&rho;_A) scaling toward the theoretical ln(2) Bell limit.
+        </div>
+      </div>
+      <div class="figure-card">
+        <img src="results/figures/fermionic_encodings_comparison.png" alt="Fermionic Encodings Comparison">
+        <div class="figure-caption">
+          <strong>Fermionic Mapping Comparison</strong>
+          Jordan-Wigner vs Bravyi-Kitaev vs Z2 Parity-Tapered 2-qubit reduction (89.6% depth reduction).
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Start CLI Guide -->
+    <h2 class="section-title">Reproducible Command-Line Interface</h2>
+    <pre># Run master 13-module hackathon verification suite
+python test_submission.py
+
+# Run standalone scientific regression unit tests
+python -m unittest discover tests
+
+# High-speed benchmark execution & generate all figures
+python main.py --quick
+
+# Interactive Rich terminal menu
+python main.py --interactive
+
+# 20-second elevator pitch & research briefing
+python main.py --explain</pre>
+
+    <footer>
+      <div>&copy; 2026 Rishendra &mdash; Qiskit Fall Hackathon 2026 (SRM University AP)</div>
+      <div>Track 1: Quantum Chemistry | Certified Research-Grade Pipeline</div>
+    </footer>
+  </div>
+</body>
+</html>
