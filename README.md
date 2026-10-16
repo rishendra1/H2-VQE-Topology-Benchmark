@@ -7,7 +7,7 @@
 **Reference Benchmark:** Classical Full Configuration Interaction (FCI) = -1.137000 Hartree  
 **Chemical Accuracy Threshold:** 1 kcal/mol ≈ 1.5936 mHartree ≈ 0.0016 Hartree  
 **Project Lead & Lead Developer:** Rishendra  
-**Collaborative Research Group:** Rishendra and Student Research Team (SRM University AP)  
+**Collaborative Research Group:** Rishendra, Jagadish Sai, Tejesh Varma and Gopichand Shashank
 
 ---
 
